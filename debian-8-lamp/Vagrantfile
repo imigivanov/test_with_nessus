@@ -1,0 +1,12 @@
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "debian/jessie64"
+  config.vm.network "private_network", ip: "172.28.128.5"
+  config.vm.hostname = "debian8.local"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get install -y net-tools
+    echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDoUUzCAyAVv7l3zXbKeSwg/PK5T9t86eBiAFRm7lLJrmXx6+vj0CG9psTWqyVOVEcnGkwjA4+uS9jtmf41wGTkmOV3vq7o8HYvWCJ7qv2onk6Cj9j4C02wcQpkAIpDc8ZD8fs6btwqii3qY2TDFApwZpJqyj4rR2xpVarGsS15Bhk0HWpPMqewjqk3PAcEAWI7IcF8r7/Kq+rzvP1jITi/2dt6J6f1h2LgRVPvc7snZ3IQ0YBBMkqZeoSXLFGQHX6+/58G+BCmoAT463SpHrIQOA1hZnTVfVm9Yr3NdpI3D7QXFSAuFPyul3PtcOx2l2WnBrI74jgzUjuwwHAZN949 devops@devops-VirtualBox' >> /home/vagrant/.ssh/authorized_keys
+  SHELL
+
+end

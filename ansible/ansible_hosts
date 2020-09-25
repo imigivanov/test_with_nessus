@@ -1,0 +1,6 @@
+[my_virtual_hosts]
+centos7 ansible_host=172.28.128.3
+centos8 ansible_host=172.28.128.4
+
+[debian]
+debian8 ansible_host=172.28.128.5

@@ -1,0 +1,16 @@
+---
+    
+    - name: deploy Apache, PHP and configure website code
+      hosts: my_virtual_hosts
+      remote_user: vagrant
+     
+      roles:
+       - web
+       
+    - name: deploy MySQL and configure databases
+      hosts: my_virtual_hosts
+      remote_user: vagrant
+       
+      roles:
+       - db
+       
