@@ -25,7 +25,11 @@
       template: src=my.cnf.j2 dest=/root/.my.cnf owner=root mode=0600
     
     - name: Set the root password for MySQL Database
-      command:  mysql -u root -p'{{ mysql_root_pw }}'  --connect-expired-password --execute="SET PASSWORD = PASSWORD('{{ masterpassword }}');"
+      command: "mysql -e \"SET PASSWORD = '{{ masterpassword }}';\"
+        --connect-expired-password -uroot -p'{{ mysql_root_pw }}'
+        && touch /root/mysql_pass_changed"
+      args: 
+        creates: /root/mysql_pass_changed
     -  set_fact:
         mysql_root_pw: "{{ masterpassword }}"
     
