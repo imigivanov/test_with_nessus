@@ -2,50 +2,63 @@
     # This playbook is to perform MySQL installations.
     
     - name: Install MySQL Software Repo
+      become: yes
       yum:
         name: http://repo.mysql.com/mysql57-community-release-el7-10.noarch.rpm
         state: present
     
     - name: Install MySQL Database
+      become: yes
       yum: name=mysql-server state=present
       
     - name: Install MySQL-python
+      become: yes
       yum: name=MySQL-python state=present
     
     - name: Start & Enable MySQL Server to start on boot
+      become: yes
       service: name=mysqld state=started enabled=yes
     
     - shell: grep 'temporary password' /var/log/mysqld.log | awk '{print $NF}';
+      become: yes
       register: result
     -  set_fact:
         mysql_root_pw: "{{ result.stdout }}"
     
     - stat: path=/root/.my.cnf
+      become: yes
       register: sym
     - set_fact: mysql_root_pw="{{ masterpassword }}"
       when: sym.stat.exists == True
     
     - name: install .my.cnf with credentials
+      become: yes
       template: src=my.cnf.j2 dest=/root/.my.cnf
                 mode=0400
       tags: my_cnf
     
     - name: Set the root password for MySQL Database
+    #   become: yes
+    #   mysql:
       command:  mysql -u root --connect-expired-password --execute="SET PASSWORD = PASSWORD('{{ masterpassword }}');"
         
     -  set_fact:
         mysql_root_pw: "{{ masterpassword }}"
     
     - name: install .my.cnf with credentials
+      become: yes
       template: src=my.cnf.j2 dest=/root/.my.cnf
                 mode=0400
       tags: my_cnf
     
     - name: Create the database for website
+      become: yes
       mysql_db: name={{ dbname }} state=present
     
     - name: Create the Application user for the database
+      become: yes
       mysql_user: name={{ dbuser }} password={{ upassword }} priv='*.*:ALL' host='%' state=present
         
     - name: Enable the firewall port for MySQL
+      become: yes
       firewalld: port={{ mysql_port }}/tcp permanent=true state=enabled immediate=yes

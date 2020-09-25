@@ -2,19 +2,29 @@
     # Playbook for Web Server
     
     - name: Install httpd and php
-      yum: name={{ item }} state=present
-      with_items:
-       - httpd
-       - php
-       - php-mysql
+      yum: name={{ packages }} state=present
+      become: yes
+      vars:
+        packages:
+          - httpd
+          - php
+          - php-mysqlnd
     
     - name: Install web role specific dependencies
-      yum: name={{ item }} state=installed
-      with_items:
-       - git
+      yum: name={{ packages }} state=installed
+      become: yes
+      vars:
+        packages:
+          - git
     
     - name: Start & Enable Apache Server to start on boot
+      become: yes
       service: name=httpd state=started enabled=yes
     
+    - name: Start & Enable firewall to start on boot
+      become: yes
+      service: name=firewalld state=started enabled=yes
+
     - name: Enable the firewall port for Apache
+      become: yes
       firewalld: port=80/tcp permanent=true state=enabled immediate=yes
