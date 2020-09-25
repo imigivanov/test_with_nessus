@@ -9,6 +9,7 @@
        
     - name: deploy MySQL and configure databases
       hosts: my_virtual_hosts
+      become: yes
       remote_user: vagrant
        
       roles:
