@@ -2,6 +2,6 @@
     - include: centos.yml
       when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
     
-    - include: ubuntu.yml
+    - include: debian.yml
       when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
     

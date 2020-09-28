@@ -1,0 +1,25 @@
+---
+    # Playbook for Web Server
+
+    - name: Add the repository for libapache2-mod-fastcgi
+      apt_repository: 
+        repo: deb http://httpredir.debian.org/debian jessie main contrib non-free
+        state: present
+
+    - name: Run the equivalent of "apt-get update" as a separate step
+      apt:
+        update_cache: true
+    
+    - name: Install apache and php
+      apt: name={{ packages }} state=present update_cache=true
+      vars:
+        packages:
+          - apache2
+          - libapache2-mod-php5
+          - php5
+
+    - name: Enable apache2 modules
+      command: a2enmod rewrite actions alias
+    
+    - name: Start & Enable Apache Server to start on boot
+      service: name=apache2 state=started enabled=yes

@@ -1,0 +1,31 @@
+---
+  - name: Add the repository for MySql 5.6
+    command: add-apt-repository 'deb http://archive.ubuntu.com/ubuntu trusty universe'
+
+  - name: Update
+    command: apt-get update
+
+  - name: Install mysql
+    apt: pkg={{ packages }} state=installed
+    become: true
+    vars:
+      packages:
+        - mysql-server-5.6
+        - mysql-client-5.6
+        - python-mysqldb
+        - libmysqlclient-dev
+
+  - name : Ensure mysql started
+    service: name=mysql state=started enabled=yes
+
+  - name: Update MySQL root password for all root accounts
+    mysql_user: name=root 
+                host={{ item }} 
+                password={{ mysql_root_password }}
+                login_user=root
+                login_password=""
+                state=present
+    loop:
+      - 127.0.0.1
+      - ::1
+      - localhost

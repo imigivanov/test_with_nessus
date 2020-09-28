@@ -1,8 +1,8 @@
 ---
     # Database system variables
-    mysqlservice: mysqld
+    # mysqlservice: mysqld
     mysql_port: 3306
-    dbuser: userofanapp
-    dbname: ASAPPCASE
-    upassword: Cio5phu3quai@#9r
-    masterpassword: iezee4ahdooN#4$8r
+    # dbuser: userofanapp
+    # dbname: ASAPPCASE
+    # upassword: Cio5phu3quai@#9r
+    mysql_root_password: iezee4ahdooN#4$8r
