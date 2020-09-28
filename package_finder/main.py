@@ -65,5 +65,20 @@ if __name__ == '__main__':
     filter = plugins["Solution"].str.contains('Update the affected ?.* packages.')
     result_dict = plugins.where(filter).dropna().to_dict()
     print("Results of scan:\n")
+
+    list_for_groomed_output = []
     for i in result_dict["Solution"]:
-        print("{} - {} - {}\n\n".format(result_dict["Host"][i], result_dict["Plugin Output"][i], result_dict["CVE"][i]))
+        dict_to_provide = {
+            "host": result_dict["Host"][i],
+            "sec_ticket": result_dict["CVE"][i],
+            "packages": [
+                {
+                    "current": result_dict["Plugin Output"][i].strip().split('\n')[0].split(':')[1].strip(),
+                    "required": result_dict["Plugin Output"][i].strip().split('\n')[1].split(':')[1].strip()
+                }
+            ]
+        }
+        list_for_groomed_output.append(dict_to_provide)
+
+    result_final_output = {"result": list_for_groomed_output}
+    print(result_final_output)
