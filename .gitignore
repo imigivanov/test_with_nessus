@@ -3,3 +3,5 @@
 venv
 .idea
 scan_results_28_09_2020.csv
+.env
+__pycache__

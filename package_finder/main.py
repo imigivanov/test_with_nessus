@@ -2,7 +2,7 @@ import requests
 import time
 from datetime import date
 import pandas
-
+from config import *
 
 def compile_headers():
     return {
@@ -54,8 +54,6 @@ def get_list_of_pkg_to_fix(filename):
 
 if __name__ == '__main__':
 
-    ACCESS_KEY = '79a2f897f56b2896f9e75d8d32e3238698f182763dad935390723a1a174e7d54'
-    SECRET_KEY = '520e15f293b72e10a2afcbd5cb1b5854be69ecfff0a6fc144a4c168b439bd1f6'
     BASIC_URL = "https://localhost:8834/scans"
 
     scan_id = 11
