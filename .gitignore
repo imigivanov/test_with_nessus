@@ -1,4 +1,5 @@
-**/.vagrant
-**/.DS_Store
-**/venv
-**/.idea
+.vagrant
+.DS_Store
+venv
+.idea
+scan_results_28_09_2020.csv

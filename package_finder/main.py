@@ -4,25 +4,40 @@ from datetime import date
 import pandas
 
 
-def request_report():
+def compile_headers():
+    return {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "X-ApiKeys": "accessKey={}; secretKey={}".format(ACCESS_KEY, SECRET_KEY)
+    }
+
+
+def url_requester(method="GET", url=None, payload=None, stream=False, json=True):
+    re = requests.request(method, url, json=payload, headers=compile_headers(), stream=stream, verify=False)
+    if json:
+        return re.json()
+    return re
+
+
+def request_report(scan):
     payload = {
         "format": "csv"
     }
-    request_url = "{}/{}/export".format(basic_url, SCAN_ID)
-    response = requests.request("POST", request_url, json=payload, headers=headers, verify=False).json()
+    request_url = "{}/{}/export".format(BASIC_URL, scan)
+    response = url_requester(method="POST", url=request_url, payload=payload)
     return response['file']
 
 
-def ready_to_download(file_id):
-    request_url = "{}/{}/export/{}/status".format(basic_url, SCAN_ID, file_id)
-    response = requests.request("GET", request_url, headers=headers, verify=False).json()
+def ready_to_download(scan, file):
+    request_url = "{}/{}/export/{}/status".format(BASIC_URL, scan, file)
+    response = url_requester(method="GET", url=request_url)
     return response['status'] == "ready"
 
 
-def download_file(file_id):
-    request_url = "{}/{}/export/{}/download".format(basic_url, SCAN_ID, file_id)
+def download_file(scan, file):
+    request_url = "{}/{}/export/{}/download".format(BASIC_URL, scan, file)
     local_filename = "scan_results_{}.csv".format(date.today().strftime("%d_%m_%Y"))
-    with requests.get(request_url, headers=headers, stream=True, verify=False) as r:
+    with url_requester(method="GET", url=request_url, stream=True, json=False) as r:
         r.raise_for_status()
         with open(local_filename, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):
@@ -41,30 +56,23 @@ if __name__ == '__main__':
 
     ACCESS_KEY = '79a2f897f56b2896f9e75d8d32e3238698f182763dad935390723a1a174e7d54'
     SECRET_KEY = '520e15f293b72e10a2afcbd5cb1b5854be69ecfff0a6fc144a4c168b439bd1f6'
-    SCAN_ID = 11
+    BASIC_URL = "https://localhost:8834/scans"
 
-    basic_url = "https://localhost:8834/scans"
+    scan_id = 11
 
-    headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "X-ApiKeys": "accessKey={}; secretKey={}".format(ACCESS_KEY, SECRET_KEY)
-    }
-
-    file_id = request_report()
+    file_id = request_report(scan_id)
 
     while True:
 
         time.sleep(2)
-        if not ready_to_download(file_id):
+        if not ready_to_download(scan_id, file_id):
             continue
 
         break
 
-    plugins = get_list_of_pkg_to_fix(download_file(file_id))
-    filter = plugins["Solution"].str.contains('Update the affected ?.* packages.')
-    result_dict = plugins.where(filter).dropna().to_dict()
-    print("Results of scan:\n")
+    packages = get_list_of_pkg_to_fix(download_file(scan_id, file_id))
+    re_filter = packages["Solution"].str.contains('Update the affected ?.* packages.')
+    result_dict = packages.where(re_filter).dropna().to_dict()
 
     list_for_groomed_output = []
     for i in result_dict["Solution"]:
