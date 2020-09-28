@@ -13,7 +13,7 @@ def request_report():
     return response['file']
 
 
-def check_if_ready_to_download(file_id):
+def ready_to_download(file_id):
     request_url = "{}/{}/export/{}/status".format(basic_url, SCAN_ID, file_id)
     response = requests.request("GET", request_url, headers=headers, verify=False).json()
     return response['status'] == "ready"
@@ -32,7 +32,7 @@ def download_file(file_id):
 
 def get_list_of_pkg_to_fix(filename):
     col_list = ["CVE", "Host", "Solution", "Plugin Output"]
-    result = pandas.read_csv(filename)
+    result = pandas.read_csv(filename, usecols=col_list)
 
     return result
 
@@ -56,11 +56,14 @@ if __name__ == '__main__':
     while True:
 
         time.sleep(2)
-        if not check_if_ready_to_download(file_id):
+        if not ready_to_download(file_id):
             continue
 
         break
 
     plugins = get_list_of_pkg_to_fix(download_file(file_id))
     filter = plugins["Solution"].str.contains('Update the affected ?.* packages.')
-    print(plugins.where(filter).dropna()['Plugin Output'])
+    result_dict = plugins.where(filter).dropna().to_dict()
+    print("Results of scan:\n")
+    for i in result_dict["Solution"]:
+        print("{} - {} - {}\n\n".format(result_dict["Host"][i], result_dict["Plugin Output"][i], result_dict["CVE"][i]))
