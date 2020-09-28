@@ -11,7 +11,7 @@ This projects consists of the following directories:
 
 ## TODO for 'package_finder 'python script
 
-- Move global constants values to .env
+- Move global constants values to .env - DONE
 - Add timeout to file export method
 - Add exception checkers
 - Add various routes to sort out the data
